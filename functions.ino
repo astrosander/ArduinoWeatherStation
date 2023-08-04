@@ -1,7 +1,7 @@
 void(* resetFunc) (void) = 0; 
 
 void checkBrightness() {
-  if (analogRead(PHOTO) < BRIGHT_THRESHOLD) {   // если темно
+  if (analogRead(PHOTO) < BRIGHT_THRESHOLD) {   // if it's dark
     analogWrite(BACKLIGHT, LCD_BRIGHT_MIN);
     CurBright = LCD_BRIGHT_MIN;
 #if (LED_MODE == 0)
@@ -193,17 +193,8 @@ void readSensors() {
   dispHum = dht.readHumidity();//bme.readHumidity();
   dispPres = analogRead(PHOTO);//(float)bme.readPressure() * 0.00750062;
   dispCO2 = mhz19.getPPM();
-
-//  TempMn = min(TempMn, dispTemp);
-//  TempMx = max(TempMx, dispTemp);
-//  HumMn = min(HumMn, dispHum);
-//  HumMx = max(HumMx, dispHum);
-//  CO2MN = min(CO2MN, dispCO2);
-//  CO2MX = max(CO2MX, dispCO2);  
   
   Serial.println(String(dispTemp) + "°C   "  + String(dispHum) + "%   light: " + String(dispPres) + "   " + String(dispCO2) + " ppm");
-
-  
   
   if (dispCO2 < 800) setLED(2);
   else if (dispCO2 < 1200) setLED(3);
@@ -215,7 +206,7 @@ void readSensors() {
 
 void drawSensors() {
 #if (DISPLAY_TYPE == 1)
-  // дисплей 2004
+  // display 2004
   lcd.setCursor(0, 2);
   lcd.print(String(dispTemp, 1));
   lcd.write(223);
@@ -239,7 +230,7 @@ void drawSensors() {
   //lcd.print(String(dispRain) + "%");
 
 #else
-  // дисплей 1602
+  // display 1602
   lcd.setCursor(0, 0);
   lcd.print(String(dispTemp, 1));
   lcd.write(223);
@@ -258,7 +249,7 @@ void drawSensors() {
 }
 
 void plotSensorsTick() {
-  // 4 минутный таймер
+  // 4 minute timer
   if (hourPlotTimer.isReady()) {
     for (byte i = 0; i < 14; i++) {
       tempHour[i] = tempHour[i + 1];
@@ -274,7 +265,7 @@ void plotSensorsTick() {
     else pressHour[14] = dispPres;
   }
 
-  // 1.5 часовой таймер
+  // 1.5 hour timer
   if (dayPlotTimer.isReady()) {
     long averTemp = 0, averHum = 0, averPress = 0, averCO2 = 0;
 
@@ -307,14 +298,14 @@ void plotSensorsTick() {
 boolean dotFlag;
 void clockTick() {
   dotFlag = !dotFlag;
-  if (dotFlag) {          // каждую секунду пересчёт времени
+  if (dotFlag) { // recalculate time every second
     secs++;
-    if (secs > 59) {      // каждую минуту
+    if (secs > 59) { // every minute
       secs = 0;
       mins++;
       if (mins <= 59 && mode == 0) drawClock(hrs, mins, 0, 0, 1);
     }
-    if (mins > 59) {      // каждый час
+    if (mins > 59) { // every hour
       now = rtc.now();
       secs = now.second();
       mins = now.minute();
